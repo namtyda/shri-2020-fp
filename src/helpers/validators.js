@@ -45,7 +45,7 @@ export const validateFieldN5 = (obj) => {
 
   const arr = filter(notWhite, values(obj));
   const result = filter(equals(arr[0]), arr);
-  return equals(length(result), 3);
+  return length(result) >= 3;
 };
 
 // 6. Две зеленые фигуры (одна из них треугольник), еще одна любая красная.
