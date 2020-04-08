@@ -14,7 +14,7 @@
  */
 
 
-import { prop, compose, equals, allPass, not, and, length, values, filter, anyPass } from 'ramda';
+import { prop, compose, equals, allPass, not, and, length, values, filter, anyPass, gte } from 'ramda';
 const colorEqual = color => compose(equals(color));
 const checkColor = (figure, color) => compose(colorEqual(color), prop(figure));
 
@@ -25,14 +25,14 @@ export const validateFieldN1 = (obj) => {
 
 // 2. Как минимум две фигуры зеленые.
 export const validateFieldN2 = (obj) => {
-  return length(filter(equals('green'), values(obj))) >= 2;
+  return gte(length(filter(equals('green'), values(obj))), 2);
 };
 
 // 3. Количество красных фигур равно кол-ву синих.
 export const validateFieldN3 = (obj) => {
   const blue = length(filter(equals('blue'), values(obj)));
   const red = length(filter(equals('red'), values(obj)));
-  return equals(blue, red);
+  return and(equals(blue, red), not(equals(red, 0)));
 };
 
 // 4. Синий круг, красная звезда, оранжевый квадрат
@@ -45,14 +45,14 @@ export const validateFieldN5 = (obj) => {
 
   const arr = filter(notWhite, values(obj));
   const result = filter(equals(arr[0]), arr);
-  return length(result) >= 3;
+  return gte(length(result), 3);
 };
 
 // 6. Две зеленые фигуры (одна из них треугольник), еще одна любая красная.
 export const validateFieldN6 = (obj) => {
   const green = anyPass([checkColor('star', 'green'), checkColor('square', 'green'), checkColor('circle', 'green')])(obj);
   const red = filter(equals('red'), values(obj));
-  return and(checkColor('triangle', 'green')(obj), and(green, length(red) > 0));
+  return and(checkColor('triangle', 'green')(obj), and(green, gte(length(red), 0)));
 };
 
 // 7. Все фигуры оранжевые.
