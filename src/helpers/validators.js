@@ -14,7 +14,7 @@
  */
 
 
-import { prop, compose, equals, allPass, not, and, length, values, filter, anyPass, gte } from 'ramda';
+import { prop, compose, equals, allPass, not, and, length, values, filter, anyPass, gte, or } from 'ramda';
 const colorEqual = color => compose(equals(color));
 const checkColor = (figure, color) => compose(colorEqual(color), prop(figure));
 
@@ -41,11 +41,13 @@ export const validateFieldN4 = (obj) => {
 };
 // 5. Три фигуры одного любого цвета кроме белого.
 export const validateFieldN5 = (obj) => {
-  const notWhite = compose(not, equals('white'))
+  // const notWhite = compose(not, equals('white'))
+  const red = gte(length(filter(equals('red'), values(obj))), 3);
+  const blue = gte(length(filter(equals('blue'), values(obj))), 3);
+  const orange = gte(length(filter(equals('orange'), values(obj))), 3);
+  const green = gte(length(filter(equals('green'), values(obj))), 3);
 
-  const arr = filter(notWhite, values(obj));
-  const result = filter(equals(arr[0]), arr);
-  return gte(length(result), 3);
+  return or(green, or(red, or(blue, orange)));
 };
 
 // 6. Две зеленые фигуры (одна из них треугольник), еще одна любая красная.
