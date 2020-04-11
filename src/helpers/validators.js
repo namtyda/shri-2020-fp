@@ -14,7 +14,7 @@
  */
 
 
-import { prop, compose, equals, allPass, not, and, length, values, filter, anyPass, gte, or } from 'ramda';
+import { prop, compose, equals, allPass, not, and, length, values, filter, anyPass, gte, or, gt } from 'ramda';
 const colorEqual = color => compose(equals(color));
 const checkColor = (figure, color) => compose(colorEqual(color), prop(figure));
 
@@ -54,7 +54,7 @@ export const validateFieldN5 = (obj) => {
 export const validateFieldN6 = (obj) => {
   const green = anyPass([checkColor('star', 'green'), checkColor('square', 'green'), checkColor('circle', 'green')])(obj);
   const red = filter(equals('red'), values(obj));
-  return and(checkColor('triangle', 'green')(obj), and(green, gte(length(red), 0)));
+  return and(checkColor('triangle', 'green')(obj), and(green, gt(length(red), 0)));
 };
 
 // 7. Все фигуры оранжевые.

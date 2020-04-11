@@ -15,37 +15,34 @@
  * Ответ будет приходить в поле {result}
  */
 import Api from '../tools/api';
+import { __, allPass, andThen, prop, tap, ifElse, modulo, length, gte, lte, compose } from 'ramda';
 
 const api = new Api();
 
-/**
- * Я – пример, удали меня
- */
-const wait = time => new Promise(resolve => {
-    setTimeout(resolve, time);
-})
+const getNumFromApi = number => api.get('https://api.tech/numbers/base', { from: 10, to: 2, number });
+const strToInt = str => compose(Math.round, parseFloat)(str);
+const getAnimalsApi = id => api.get(`https://animals.tech/${id}`, {});
+const validateNum = str => /^[0-9]+(\.)?[0-9]*$/.test(str);
+const getConvertNum = num => compose(andThen(prop('result')), getNumFromApi)(num);
+const getAnimals = id => compose(andThen(prop('result')), getAnimalsApi)(id);
+const strLengthTen = str => lte(str.length, 10);
+const strLengthTwo = str => gte(str.length, 2);
+const validStr = str => allPass([strLengthTen, strLengthTwo, validateNum])(str);
+const square = number => number ** 2;
 
-const processSequence = ({value, writeLog, handleSuccess, handleError}) => {
-    /**
-     * Я – пример, удали меня
-     */
-    writeLog(value);
-
-    api.get('https://api.tech/numbers/base', {from: 2, to: 10, number: '01011010101'}).then(({result}) => {
-        writeLog(result);
-    });
-
-    wait(2500).then(() => {
-        writeLog('SecondLog')
-
-        return wait(1500);
-    }).then(() => {
-        writeLog('ThirdLog');
-
-        return wait(400);
-    }).then(() => {
-        handleSuccess('Done');
-    });
+const processSequence = ({ value, writeLog, handleSuccess, handleError }) => {
+    return compose(
+        ifElse(
+            validStr,
+            compose(
+                andThen(handleSuccess),
+                andThen(compose(getAnimals, tap(writeLog), modulo(__, 3), tap(writeLog), square, tap(writeLog), length, tap(writeLog))),
+                getConvertNum,
+                strToInt),
+            () => handleError('ValidationError'),
+        ),
+        tap(writeLog)
+    )(value);
 }
 
 export default processSequence;
