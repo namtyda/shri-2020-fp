@@ -15,7 +15,7 @@
  * Ответ будет приходить в поле {result}
  */
 import Api from '../tools/api';
-import { __, allPass, andThen, prop, tap, ifElse, modulo, length, gte, lte, compose } from 'ramda';
+import { __, allPass, andThen, prop, tap, ifElse, modulo, length, gte, lte, compose, otherwise } from 'ramda';
 
 const api = new Api();
 
@@ -35,8 +35,8 @@ const processSequence = ({ value, writeLog, handleSuccess, handleError }) => {
         ifElse(
             validStr,
             compose(
-                andThen(handleSuccess),
-                andThen(compose(getAnimals, tap(writeLog), modulo(__, 3), tap(writeLog), square, tap(writeLog), length, tap(writeLog))),
+                otherwise(tap(handleError)),
+                andThen(compose(andThen(handleSuccess), getAnimals, tap(writeLog), modulo(__, 3), tap(writeLog), square, tap(writeLog), length, tap(writeLog))),
                 getConvertNum,
                 strToInt),
             () => handleError('ValidationError'),
